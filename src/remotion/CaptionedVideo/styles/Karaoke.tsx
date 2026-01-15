@@ -37,7 +37,6 @@ export const KaraokeCaptions: React.FC<KaraokeCaptionsProps> = ({
   // Split text into words for karaoke effect
   const words = useMemo(() => text.split(/\s+/), [text]);
   const wordDuration = duration / words.length;
-  const progress = (currentTime - startTime) / duration;
 
   return (
     <AbsoluteFill

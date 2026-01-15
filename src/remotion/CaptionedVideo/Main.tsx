@@ -1,13 +1,11 @@
 import { z } from "zod";
 import {
   AbsoluteFill,
-  Sequence,
   useCurrentFrame,
   useVideoConfig,
   Video,
-  staticFile,
 } from "remotion";
-import { CaptionedVideoProps, CaptionStyleType } from "../../types/constants";
+import { CaptionedVideoProps } from "../../types/constants";
 import { BottomCenteredCaptions } from "./styles/BottomCentered";
 import { TopBarCaptions } from "./styles/TopBar";
 import { KaraokeCaptions } from "./styles/Karaoke";
@@ -20,7 +18,7 @@ export const CaptionedVideoMain = ({
   style,
 }: z.infer<typeof CaptionedVideoProps>) => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
+  const { fps } = useVideoConfig();
   const currentTime = frame / fps;
 
   // Get current caption based on time

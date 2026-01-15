@@ -55,7 +55,7 @@ export const uploadVideo = async (
   const filePath = path.join(tmpDir, fileName);
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  await fs.writeFile(filePath, buffer);
+  await fs.writeFile(filePath, new Uint8Array(buffer));
 
   // Return an API URL that can be accessed via HTTP
   // Encode the file path for the URL
