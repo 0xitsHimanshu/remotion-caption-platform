@@ -77,6 +77,8 @@ export const CaptionedVideoMain = ({
       <Video
         src={videoSource}
         startFrom={0}
+        // Increase timeout to 90 seconds for video loading (especially for Supabase URLs)
+        delayRenderTimeoutInMilliseconds={90000}
         style={{
           width: "100%",
           height: "100%",

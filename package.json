@@ -9,7 +9,6 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@remotion/bundler": "4.0.405",
     "@remotion/cli": "4.0.405",
-    "@remotion/google-fonts": "^4.0.405",
     "@remotion/lambda": "4.0.405",
     "@remotion/paths": "4.0.405",
     "@remotion/player": "4.0.405",

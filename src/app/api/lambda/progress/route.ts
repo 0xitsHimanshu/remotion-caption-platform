@@ -21,13 +21,23 @@ export const POST = executeApi<ProgressResponse, typeof ProgressRequest>(
       renderId: body.id,
     });
 
+    // Check for fatal errors first
     if (renderProgress.fatalErrorEncountered) {
+      const errorMessage = renderProgress.errors[0]?.message || "Unknown error occurred";
+      console.error("Fatal error in render:", errorMessage);
       return {
         type: "error",
-        message: renderProgress.errors[0].message,
+        message: errorMessage,
       };
     }
 
+    // Check for non-fatal errors that might cause issues
+    if (renderProgress.errors && renderProgress.errors.length > 0) {
+      const errorMessages = renderProgress.errors.map((e) => e.message).join("; ");
+      console.warn("Non-fatal errors in render:", errorMessages);
+    }
+
+    // Check if render is complete
     if (renderProgress.done) {
       return {
         type: "done",
@@ -36,9 +46,13 @@ export const POST = executeApi<ProgressResponse, typeof ProgressRequest>(
       };
     }
 
+    // Log progress for debugging
+    const progress = Math.max(0.03, renderProgress.overallProgress);
+    console.log(`Render progress: ${(progress * 100).toFixed(2)}%`);
+
     return {
       type: "progress",
-      progress: Math.max(0.03, renderProgress.overallProgress),
+      progress: progress,
     };
   },
 );
