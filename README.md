@@ -182,6 +182,116 @@ src/
     └── schema.ts           # API request/response schemas
 ```
 
+## Technical Decisions
+
+This section explains the rationale behind our technology choices and architectural decisions.
+
+### Core Technologies
+
+#### **Remotion** - Programmatic Video Creation
+**Why Remotion?**
+- **React-based video composition**: Allows us to build video components using familiar React patterns, making it easy to create dynamic, reusable caption styles
+- **Frame-perfect synchronization**: Remotion's frame-based rendering ensures captions are perfectly timed with video playback, critical for accurate subtitle display
+- **Real-time preview**: The Remotion Player enables instant preview of captioned videos during development, significantly improving the development experience
+- **Lambda integration**: Remotion Lambda provides serverless video rendering, eliminating the need to maintain expensive video processing infrastructure
+- **Programmatic control**: Unlike traditional video editing tools, Remotion allows us to programmatically generate captions with precise timing, animations, and styling
+
+#### **Next.js 16** - Full-Stack React Framework
+**Why Next.js?**
+- **API Routes**: Built-in API routes (`/api/*`) allow us to handle video uploads, transcription requests, and Lambda rendering without a separate backend server
+- **Server Components**: Enables efficient server-side rendering and data fetching, reducing client-side bundle size
+- **File-based routing**: Simple, intuitive routing structure that maps directly to our file system
+- **Production-ready**: Built-in optimizations for images, fonts, and code splitting out of the box
+- **Vercel deployment**: Seamless deployment to Vercel with zero configuration, perfect for serverless architecture
+
+#### **AssemblyAI** - Speech-to-Text Transcription
+**Why AssemblyAI?**
+- **Word-level timestamps**: Provides precise timing information for each word, essential for creating accurate, synchronized captions
+- **Language detection**: Automatic language detection supports multilingual content, including Hinglish (Hindi + English)
+- **High accuracy**: Industry-leading accuracy for speech recognition, especially important for non-English languages
+- **Simple API**: Straightforward REST API with excellent TypeScript support, making integration seamless
+- **Public URL requirement**: While requiring publicly accessible video URLs is a constraint, it ensures reliable transcription service access
+
+#### **Supabase** - Video Storage
+**Why Supabase?**
+- **Public URLs**: Generates publicly accessible URLs required by AssemblyAI for transcription
+- **CDN integration**: Built-in CDN ensures fast video delivery globally, improving user experience
+- **Simple setup**: Easy-to-use JavaScript SDK with minimal configuration
+- **Cost-effective**: Generous free tier and transparent pricing for video storage
+- **Fallback support**: Our architecture gracefully falls back to local storage for development when Supabase isn't configured
+
+#### **AWS Lambda (Remotion Lambda)** - Serverless Video Rendering
+**Why AWS Lambda for rendering?**
+- **No infrastructure management**: Serverless architecture means no servers to maintain, scale, or monitor
+- **Cost efficiency**: Pay only for actual rendering time, not idle server costs
+- **Automatic scaling**: Handles concurrent video rendering requests automatically
+- **Remotion integration**: Official Remotion Lambda package provides seamless integration with optimized rendering pipelines
+- **Concurrency control**: Built-in mechanisms to manage rendering concurrency and prevent AWS quota limits
+
+### Frontend Technologies
+
+#### **Radix UI** - Accessible Component Primitives
+**Why Radix UI?**
+- **Accessibility first**: All components are built with WAI-ARIA compliance, ensuring our platform is usable by everyone
+- **Unstyled primitives**: Provides behavior and accessibility without imposing styles, giving us full design control
+- **Headless components**: Perfect for building custom UI that matches our design system
+- **Used via shadcn/ui**: Leverages the shadcn/ui component library pattern for easy customization and maintenance
+
+#### **Tailwind CSS** - Utility-First Styling
+**Why Tailwind CSS?**
+- **Rapid development**: Utility classes enable fast UI development without writing custom CSS
+- **Consistent design system**: Built-in design tokens ensure visual consistency across the application
+- **Small bundle size**: PurgeCSS automatically removes unused styles, keeping bundle sizes minimal
+- **Modern features**: Built-in support for dark mode, responsive design, and CSS custom properties
+- **Developer experience**: Excellent IntelliSense support and clear documentation
+
+#### **TypeScript** - Type Safety
+**Why TypeScript?**
+- **Type safety**: Catches errors at compile time, preventing runtime bugs in critical video processing workflows
+- **Better IDE support**: Enhanced autocomplete, refactoring, and navigation in VS Code
+- **Self-documenting code**: Types serve as inline documentation, making the codebase easier to understand
+- **Remotion compatibility**: Remotion has excellent TypeScript support, making integration seamless
+
+#### **Zod** - Schema Validation
+**Why Zod?**
+- **Runtime validation**: Validates API request/response data at runtime, ensuring data integrity
+- **Type inference**: Automatically generates TypeScript types from schemas, eliminating type duplication
+- **Error messages**: Provides clear, actionable error messages for invalid data
+- **API safety**: Critical for validating video URLs, caption data, and rendering parameters before processing
+
+### Specialized Features
+
+#### **Hinglish Support** - Hindi + English Text Rendering
+**Why Noto Sans fonts?**
+- **Comprehensive character coverage**: Noto Sans and Noto Sans Devanagari provide complete coverage for both English and Hindi (Devanagari script) characters
+- **Visual consistency**: Both fonts are designed to work together, ensuring consistent appearance in mixed-language text
+- **Google Fonts CDN**: Reliable, fast font delivery via Google Fonts CDN, available globally
+- **Automatic font selection**: CSS font-family fallback automatically selects the appropriate font for each character
+- **Market requirement**: Hinglish (mixed Hindi-English) is widely used in India, making this a critical feature for our target audience
+
+#### **Caption Style System** - Modular Style Architecture
+**Why separate style components?**
+- **Reusability**: Each style (Bottom-Centered, Top-Bar, Karaoke) is a separate component, making it easy to add new styles
+- **Maintainability**: Changes to one style don't affect others, reducing regression risk
+- **Performance**: Only the selected style component is rendered, optimizing bundle size
+- **Extensibility**: New caption styles can be added by creating a new component following the same interface
+
+#### **Retry Logic & Error Handling**
+**Why implement retry logic?**
+- **AWS Lambda concurrency limits**: AWS has rate limits on Lambda invocations; retry logic handles temporary throttling gracefully
+- **Network resilience**: Transient network issues are automatically retried with exponential backoff
+- **User experience**: Users don't need to manually retry failed operations; the system handles it automatically
+- **Cost optimization**: Prevents unnecessary failed requests that would still incur costs
+
+### Development Tools
+
+#### **ESLint + Prettier** - Code Quality
+**Why these tools?**
+- **Code consistency**: Ensures consistent code style across the entire codebase
+- **Error prevention**: Catches common mistakes and enforces best practices
+- **Remotion-specific rules**: Uses `@remotion/eslint-config-flat` for Remotion-specific linting rules
+- **Team collaboration**: Standardized formatting reduces merge conflicts and improves code review efficiency
+
 ## Caption Styles
 
 1. **Bottom-Centered**: Standard subtitle style at the bottom center of the video
@@ -240,9 +350,6 @@ Response: RenderMediaOnLambdaOutput
 - Check that Noto Sans fonts are loaded in the browser
 - Verify text encoding is UTF-8
 
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
 
 ## Credits
 
